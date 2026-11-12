@@ -103,3 +103,7 @@ La suite usa datos temporales y los puertos **3197, 3199, 3201 y 3205**, que deb
 Código: `server.js` (API y migraciones), `lib/storage.js` (respaldo/recuperación), `scripts/restore.js` (restauración), `public/` (interfaz), `test/` (pruebas). `data/` y `node_modules/` están excluidos de Git. Usa `npm ci` para una instalación reproducible.
 
 Cada tarea de nube tiene un entorno aislado. Usa el checkout existente `/workspace/sysdocu`; no se necesitan worktrees.
+
+## Documento del proyecto de grado
+
+La actualización de los capítulos I–IV, con Cascada, casos de uso, modelo relacional, diccionario de datos, mockups y pruebas funcionales, está en [docs/academico](docs/academico/LEEME.md). Incluye Word editable, PDF y fuentes/evidencias. Su referencia de código es la versión 2.1.0 (e41c5de); no modifica la aplicación ni los datos.

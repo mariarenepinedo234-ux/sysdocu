@@ -1,0 +1,20 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=TB;
+client[shape=box,label="Navegador
+HTML + CSS + JavaScript
+Login, paneles y reportes imprimibles"];
+server[shape=box,label="Servidor Node.js + Express
+Autenticación · API · reglas de permisos"];
+db[shape=cylinder,label="SQLite · data/ceicom.sqlite
+Usuarios, metadatos, versiones, revisiones y auditoría"];
+files[shape=folder,label="data/files/
+PDF, DOC y DOCX con nombres aleatorios"];
+backup[shape=folder,label="data/backups/
+Instantánea SQLite + archivos + manifiesto SHA-256"];
+operator[shape=box,label="Restauración local
+npm run restore -- archivo.zip
+Servidor detenido"];
+client -> server[label="HTTP local / HTTPS en despliegue
+JSON, multipart y cookie HttpOnly",dir=both];server -> db[label="SQL parametrizado",dir=both];server -> files[label="Lectura y escritura controladas",dir=both];db -> backup[label="VACUUM INTO"];files -> backup[label="Incluye versiones y retirados"];backup -> operator;operator -> db[style=dashed,label="Recuperación validada"];operator -> files[style=dashed];
+}

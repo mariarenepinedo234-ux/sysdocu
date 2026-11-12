@@ -1,0 +1,15 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=LR;owner [shape=none,image="/workspace/sysdocu/docs/academico/figuras/actor.png",label="Propietario / gestor",labelloc=b,width=1.5,height=1.3,imagescale=true];reader [shape=none,image="/workspace/sysdocu/docs/academico/figuras/actor.png",label="Lector autorizado",labelloc=b,width=1.5,height=1.3,imagescale=true];
+subgraph cluster_system {label="Gestión documental · sesión activa como precondición";color="#d2b4ab";
+node[shape=ellipse];create[label="Registrar documento"];upload[label="Cargar nueva versión"];validate[label="Validar archivo y metadatos"];metadata[label="Editar metadatos"];history[label="Consultar versiones
+y descargar anteriores"];remove[label="Retirar a papelera"];restore[label="Restaurar documento"];pending[label="Dejar pendiente
+de revisión"];query[label="Buscar y consultar"];download[label="Descargar archivo actual"];preview[label="Ver PDF en navegador"];
+}
+owner -> create[dir=none];owner -> upload[dir=none];owner -> metadata[dir=none];owner -> history[dir=none];owner -> remove[dir=none];owner -> restore[dir=none];
+reader -> query[dir=none];reader -> download[dir=none];reader -> preview[dir=none];
+create -> validate[style=dashed,label="«include»",arrowhead=empty];upload -> validate[style=dashed,label="«include»",arrowhead=empty];
+create -> pending[style=dashed,label="«include»",arrowhead=empty];upload -> pending[style=dashed,label="«include»",arrowhead=empty];metadata -> pending[style=dashed,label="«include»",arrowhead=empty];restore -> pending[style=dashed,label="«include»",arrowhead=empty];
+preview -> query[style=dashed,label="«extend»
+[archivo PDF]",arrowhead=empty];
+}

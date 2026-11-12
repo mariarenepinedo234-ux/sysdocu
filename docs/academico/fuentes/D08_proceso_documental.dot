@@ -1,0 +1,12 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=TB;node[shape=box];
+a[label="Usuario autorizado inicia sesión"];b[label="Registra título, categoría, área, gestión y visibilidad"];
+c[label="Carga PDF / DOC / DOCX (hasta 10 MB)"];d[shape=diamond,label="¿Archivo y datos válidos?"];
+e[label="Guardar archivo + metadatos + versión inicial
+Estado Pendiente"];f[label="Revisor del área o administrador examina"];
+g[shape=diamond,label="¿Aprobar u observar?"];h[label="Observado con comentarios"];i[label="Propietario corrige / carga nueva versión"];
+j[label="Aprobado"];k[label="Consulta / descarga según permisos"];x[label="Rechazar solicitud con mensaje"];
+a->b->c->d;d->e[label="Sí"];d->x[label="No"];x->b;e->f->g;g->h[label="Observar"];h->i->e;g->j[label="Aprobar"];j->k;
+
+}

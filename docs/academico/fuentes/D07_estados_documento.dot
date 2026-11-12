@@ -1,0 +1,15 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=LR;node[shape=box,style="rounded,filled"];
+start[shape=point,fillcolor="#74180f"];pending[label="PENDIENTE
+Propietario y gestores pueden consultar"];
+approved[label="APROBADO
+Lectura compartida según visibilidad"];observed[label="OBSERVADO
+Comentario de corrección requerido"];
+removed[label="PAPELERA (removed=1)
+Sin descargas de archivo ni versiones"];
+start -> pending[label="Carga inicial"];pending -> approved[label="Revisor autorizado
+versión vigente"];pending -> observed[label="Observaciones"];approved -> pending[label="Nueva versión o edición"];observed -> pending[label="Corrección / nueva versión"];
+pending -> removed[label="Retiro"];approved -> removed[label="Retiro"];observed -> removed[label="Retiro"];removed -> pending[label="Restauración"];
+
+}

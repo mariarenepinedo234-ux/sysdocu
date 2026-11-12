@@ -1,0 +1,14 @@
+{
+  "paginas_pdf": 92,
+  "figuras": 27,
+  "tablas": 85,
+  "tablas_sqlite": 8,
+  "campos_sqlite": 54,
+  "integridad_docx": "correcta",
+  "capitulos_principales": 4,
+  "texto_fuera_pagina": [],
+  "codigo_referencia": "e41c5de4968d967f33311fae147091f814d15a21",
+  "casos_ejecutables": 23,
+  "agrupadores": 3,
+  "resultados_node": 26
+}

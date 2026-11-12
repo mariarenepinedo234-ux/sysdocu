@@ -1,0 +1,170 @@
+TAP version 13
+# Subtest: Historial: fechas inclusivas, reportes completos y permisos
+    # Subtest: Filtrado inclusivo, rango de un día y conteo sin límite
+    ok 1 - Filtrado inclusivo, rango de un día y conteo sin límite
+      ---
+      duration_ms: 26.139958
+      type: 'test'
+      ...
+    # Subtest: Fechas inválidas, duplicadas y rangos invertidos se rechazan en todas las rutas
+    ok 2 - Fechas inválidas, duplicadas y rangos invertidos se rechazan en todas las rutas
+      ---
+      duration_ms: 35.410555
+      type: 'test'
+      ...
+    # Subtest: Personal administrativo solo ve y exporta su actividad; docentes sin acceso
+    ok 3 - Personal administrativo solo ve y exporta su actividad; docentes sin acceso
+      ---
+      duration_ms: 49.717961
+      type: 'test'
+      ...
+    # Subtest: Reportes exportan todo el rango, incluyen fechas y quedan auditados
+    ok 4 - Reportes exportan todo el rango, incluyen fechas y quedan auditados
+      ---
+      duration_ms: 18.624071
+      type: 'test'
+      ...
+    # Subtest: Reporte vacío se genera sin errores y el logo se sirve correctamente
+    ok 5 - Reporte vacío se genera sin errores y el logo se sirve correctamente
+      ---
+      duration_ms: 22.620168
+      type: 'test'
+      ...
+    1..5
+ok 1 - Historial: fechas inclusivas, reportes completos y permisos
+  ---
+  duration_ms: 2510.696128
+  type: 'test'
+  ...
+# Subtest: Flujo documental, permisos y persistencia SQLite
+    # Subtest: Inicio de sesión y rutas protegidas
+    ok 1 - Inicio de sesión y rutas protegidas
+      ---
+      duration_ms: 52.174589
+      type: 'test'
+      ...
+    # Subtest: Usuarios y asignación de roles
+    ok 2 - Usuarios y asignación de roles
+      ---
+      duration_ms: 202.324095
+      type: 'test'
+      ...
+# LIMIT_FILE_SIZE File too large
+    # Subtest: Carga válida y rechazo de formatos y tamaño
+    ok 3 - Carga válida y rechazo de formatos y tamaño
+      ---
+      duration_ms: 562.359826
+      type: 'test'
+      ...
+    # Subtest: Privacidad, descarga íntegra y búsqueda
+    ok 4 - Privacidad, descarga íntegra y búsqueda
+      ---
+      duration_ms: 16.729476
+      type: 'test'
+      ...
+    # Subtest: Edición autorizada y consulta institucional
+    ok 5 - Edición autorizada y consulta institucional
+      ---
+      duration_ms: 21.148306
+      type: 'test'
+      ...
+    # Subtest: Persistencia al reiniciar
+    ok 6 - Persistencia al reiniciar
+      ---
+      duration_ms: 356.358368
+      type: 'test'
+      ...
+    # Subtest: Retiro lógico, categorías referenciadas y auditoría
+    ok 7 - Retiro lógico, categorías referenciadas y auditoría
+      ---
+      duration_ms: 15.48905
+      type: 'test'
+      ...
+    # Subtest: Cambio de contraseña y cierre de sesión
+    ok 8 - Cambio de contraseña y cierre de sesión
+      ---
+      duration_ms: 207.115911
+      type: 'test'
+      ...
+    1..8
+ok 2 - Flujo documental, permisos y persistencia SQLite
+  ---
+  duration_ms: 2749.489645
+  type: 'test'
+  ...
+# Subtest: Mejoras v2: permisos, versiones, reportes, papelera y recuperación
+    # Subtest: Asignación de área y documento pendiente sin filtración
+    ok 1 - Asignación de área y documento pendiente sin filtración
+      ---
+      duration_ms: 91.259738
+      type: 'test'
+      ...
+    # Subtest: Observaciones obligatorias y aprobación por área
+    ok 2 - Observaciones obligatorias y aprobación por área
+      ---
+      duration_ms: 35.820723
+      type: 'test'
+      ...
+    # Subtest: Vista previa PDF protegida y filtros combinados
+    ok 3 - Vista previa PDF protegida y filtros combinados
+      ---
+      duration_ms: 18.743271
+      type: 'test'
+      ...
+    # Subtest: Excel real sin fórmulas y reporte imprimible con los mismos permisos
+    ok 4 - Excel real sin fórmulas y reporte imprimible con los mismos permisos
+      ---
+      duration_ms: 34.906666
+      type: 'test'
+      ...
+    # Subtest: Historial de versiones íntegro y nueva carga vuelve a revisión
+    ok 5 - Historial de versiones íntegro y nueva carga vuelve a revisión
+      ---
+      duration_ms: 44.657856
+      type: 'test'
+      ...
+    # Subtest: Papelera, versiones bloqueadas y restauración con revisión pendiente
+    ok 6 - Papelera, versiones bloqueadas y restauración con revisión pendiente
+      ---
+      duration_ms: 31.373379
+      type: 'test'
+      ...
+    # Subtest: Respaldo íntegro incluye todas las versiones y excluye sesiones/credenciales
+    ok 7 - Respaldo íntegro incluye todas las versiones y excluye sesiones/credenciales
+      ---
+      duration_ms: 41.143841
+      type: 'test'
+      ...
+    # Subtest: Restauración exige servidor detenido y rechaza ZIP alterado
+    ok 8 - Restauración exige servidor detenido y rechaza ZIP alterado
+      ---
+      duration_ms: 845.291372
+      type: 'test'
+      ...
+    # Subtest: Respaldo automático al reiniciar y retención de siete copias
+    ok 9 - Respaldo automático al reiniciar y retención de siete copias
+      ---
+      duration_ms: 474.473421
+      type: 'test'
+      ...
+    1..9
+ok 3 - Mejoras v2: permisos, versiones, reportes, papelera y recuperación
+  ---
+  duration_ms: 3269.472233
+  type: 'test'
+  ...
+# Subtest: Migración desde v1 preserva cuentas, documentos, fechas y retiro
+ok 4 - Migración desde v1 preserva cuentas, documentos, fechas y retiro
+  ---
+  duration_ms: 568.168845
+  type: 'test'
+  ...
+1..4
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4055.62836

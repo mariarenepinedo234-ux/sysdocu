@@ -1,0 +1,11 @@
+{
+  "sistema": "SYSDOCU",
+  "version": "2.1.0",
+  "commit_codigo": "e41c5de4968d967f33311fae147091f814d15a21",
+  "fecha_utc": "2026-11-12T22:50:19.707648+00:00",
+  "node": "v24.22.1",
+  "npm": "11.9.0",
+  "plataforma": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "comando": "node --test --test-reporter=tap",
+  "datos": "Directorios temporales de prueba; sin datos institucionales reales."
+}

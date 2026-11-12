@@ -1,0 +1,17 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=TB;
+analisis [shape=box,label="FASE I · ANÁLISIS
+Problema, actores, requisitos y casos de uso"];
+diseno [shape=box,label="FASE II · DISEÑO
+Arquitectura, modelo relacional, diccionario y mockups"];
+desarrollo [shape=box,label="FASE III · DESARROLLO
+Node.js, API, SQLite, permisos y módulos web"];
+pruebas [shape=box,label="FASE IV · PRUEBAS
+Casos funcionales, migración y recuperación"];
+implementacion [shape=box,label="FASE V · IMPLEMENTACIÓN Y MANTENIMIENTO
+Instalación reproducible, manuales y operación propuesta"];
+analisis -> diseno -> desarrollo -> pruebas -> implementacion;
+pruebas -> desarrollo [label="Corrección y nueva verificación",style=dashed,constraint=false];
+desarrollo -> diseno [label="Ajuste documentado",style=dashed,constraint=false];
+}

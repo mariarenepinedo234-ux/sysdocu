@@ -1,0 +1,18 @@
+digraph G {
+graph [fontname="DejaVu Sans",bgcolor="white",pad="0.25",nodesep="0.32",ranksep="0.8",splines=polyline];node [fontname="DejaVu Sans",fontsize=12,color="#74180f",fontcolor="#383331",style=filled,fillcolor="#faf8f3",penwidth=1.2];edge [fontname="DejaVu Sans",fontsize=10,color="#756d67",fontcolor="#534e4b",arrowsize=.7];
+rankdir=LR;admin [shape=none,image="/workspace/sysdocu/docs/academico/figuras/actor.png",label="Administrador",labelloc=b,width=1.5,height=1.3,imagescale=true];staff [shape=none,image="/workspace/sysdocu/docs/academico/figuras/actor.png",label="Personal administrativo",labelloc=b,width=1.5,height=1.3,imagescale=true];teacher [shape=none,image="/workspace/sysdocu/docs/academico/figuras/actor.png",label="Docente autorizado",labelloc=b,width=1.5,height=1.3,imagescale=true];
+subgraph cluster_system {label="SYSDOCU · Sistema web de gestión documental";color="#d2b4ab";style=rounded;
+node[shape=ellipse];access[label="Iniciar / cerrar sesión
+y cambiar contraseña"];consult[label="Consultar documentos, PDF
+y reportes de inventario"];manage[label="Gestionar documentos,
+versiones y papelera"];review[label="Revisar, aprobar
+u observar"];catalog[label="Gestionar usuarios,
+áreas y categorías"];history[label="Consultar historial
+y generar reportes"];backup[label="Crear y descargar
+respaldos"];
+}
+admin -> access [dir=none];admin -> consult [dir=none];admin -> manage[dir=none];admin -> review[dir=none];admin -> catalog[dir=none];admin -> history[dir=none];admin -> backup[dir=none];
+staff -> access[dir=none];staff -> consult[dir=none];staff -> manage[dir=none,label="Propios / su área"];staff -> review[dir=none,label="Su área"];staff -> history[dir=none,label="Su actividad"];
+teacher -> access[dir=none];teacher -> consult[dir=none,label="Según aprobación y visibilidad"];teacher -> manage[dir=none,label="Propios"];
+
+}
