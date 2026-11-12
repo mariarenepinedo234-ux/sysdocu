@@ -17,6 +17,7 @@ import {
   listBackups,
   digest,
 } from "./lib/storage.js";
+import { workbook, printReport } from "./lib/reports.js";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dir = path.resolve(process.env.DATA_DIR || path.join(root, "data"));
 fs.mkdirSync(path.join(dir, "files"), { recursive: true });
@@ -801,18 +802,6 @@ app.post("/api/documents/:id/review", staff, (req, res) => {
   });
   res.json({ ok: true });
 });
-const xml = (v) =>
-  String(v ?? "").replace(
-    /[&<>"']/g,
-    (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&apos;",
-      })[c],
-  );
 const reportHeaders = [
   "Título",
   "Categoría",
@@ -840,63 +829,12 @@ function reportRows(req) {
   ]);
 }
 app.get("/api/reports.xlsx", (req, res) => {
-  const rows = [reportHeaders, ...reportRows(req)],
-    zip = new AdmZip();
-  const letters = (n) => {
-    let s = "";
-    for (n++; n; n = Math.floor((n - 1) / 26))
-      s = String.fromCharCode(65 + ((n - 1) % 26)) + s;
-    return s;
-  };
-  zip.addFile(
-    "[Content_Types].xml",
-    Buffer.from(
-      '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>',
-    ),
-  );
-  zip.addFile(
-    "_rels/.rels",
-    Buffer.from(
-      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
-    ),
-  );
-  zip.addFile(
-    "xl/workbook.xml",
-    Buffer.from(
-      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Inventario CEICOM" sheetId="1" r:id="rId1"/></sheets></workbook>',
-    ),
-  );
-  zip.addFile(
-    "xl/_rels/workbook.xml.rels",
-    Buffer.from(
-      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
-    ),
-  );
-  zip.addFile(
-    "xl/worksheets/sheet1.xml",
-    Buffer.from(
-      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' +
-        rows
-          .map(
-            (r, i) =>
-              `<row r="${i + 1}">` +
-              r
-                .map(
-                  (v, j) =>
-                    `<c r="${letters(j)}${i + 1}" t="inlineStr"><is><t xml:space="preserve">${xml(v)}</t></is></c>`,
-                )
-                .join("") +
-              "</row>",
-          )
-          .join("") +
-        "</sheetData></worksheet>",
-    ),
-  );
-  audit(req.user.id, "Reporte Excel", String(rows.length - 1) + " documentos");
+  const rows = reportRows(req);
+  audit(req.user.id, "Reporte Excel", rows.length + " documentos");
   res
     .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     .attachment("inventario-ceicom.xlsx")
-    .send(zip.toBuffer());
+    .send(workbook(reportHeaders, rows, "Inventario CEICOM"));
 });
 app.get("/api/reports/print", (req, res) => {
   const rows = reportRows(req);
@@ -904,7 +842,17 @@ app.get("/api/reports/print", (req, res) => {
   res
     .type("html")
     .send(
-      `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Inventario CEICOM</title><link rel="stylesheet" href="/report.css"></head><body><button id="print">Imprimir / Guardar como PDF</button><h1>CEICOM · Inventario documental</h1><p>Generado: ${xml(new Date().toISOString())} · Usuario: ${xml(req.user.name)} · ${rows.length} documentos</p><p>Filtros aplicados: ${xml(new URLSearchParams(req.query).toString() || "Todos los documentos autorizados")}</p><table><thead><tr>${reportHeaders.map((h) => "<th>" + h + "</th>").join("")}</tr></thead><tbody>${rows.map((r) => "<tr>" + r.map((v) => "<td>" + xml(v) + "</td>").join("") + "</tr>").join("")}</tbody></table><script src="/report.js"></script></body></html>`,
+      printReport({
+        title: "CEICOM · Inventario documental",
+        user: req.user.name,
+        description:
+          "Filtros aplicados: " +
+          (new URLSearchParams(req.query).toString() ||
+            "Todos los documentos autorizados"),
+        headers: reportHeaders,
+        rows,
+        noun: "documentos",
+      }),
     );
 });
 app.get("/api/backups", admin, (req, res) =>
@@ -939,15 +887,117 @@ function automaticBackup() {
 }
 automaticBackup();
 setInterval(automaticBackup, 60000).unref();
-app.get("/api/activity", staff, (req, res) =>
-  res.json(
-    db
-      .prepare(
-        "SELECT a.*,u.name AS user FROM activity a JOIN users u ON u.id=a.user_id WHERE (?='administrador' OR a.user_id=?) ORDER BY a.id DESC LIMIT 200",
-      )
-      .all(req.user.role, req.user.id),
-  ),
+function activityRange(query) {
+  const range = {};
+  for (const field of ["from", "to"]) {
+    const v = query[field];
+    if (v === undefined || v === "") continue;
+    if (
+      typeof v !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(v) ||
+      Number(v.slice(0, 4)) < 1900 ||
+      Number(v.slice(0, 4)) > 9999
+    )
+      throw Error("Ingrese fechas válidas en formato AAAA-MM-DD.");
+    const parsed = new Date(v + "T00:00:00Z");
+    if (
+      !Number.isFinite(parsed.getTime()) ||
+      parsed.toISOString().slice(0, 10) !== v
+    )
+      throw Error("Ingrese una fecha de calendario válida.");
+    range[field] = v;
+  }
+  if (range.from && range.to && range.from > range.to)
+    throw Error("La fecha Desde no puede ser posterior a Hasta.");
+  return range;
+}
+function activityQuery(user, range) {
+  let where = "(?='administrador' OR a.user_id=?)";
+  const args = [user.role, user.id];
+  if (range.from) {
+    where += " AND date(a.created_at)>=?";
+    args.push(range.from);
+  }
+  if (range.to) {
+    where += " AND date(a.created_at)<=?";
+    args.push(range.to);
+  }
+  return { where, args };
+}
+function listActivity(user, range, limit = false) {
+  const { where, args } = activityQuery(user, range);
+  return db
+    .prepare(
+      `SELECT a.*,u.name AS user FROM activity a JOIN users u ON u.id=a.user_id WHERE ${where} ORDER BY a.created_at DESC,a.id DESC${limit ? " LIMIT 200" : ""}`,
+    )
+    .all(...args);
+}
+function rangeMiddleware(req, res, next) {
+  try {
+    req.range = activityRange(req.query);
+    next();
+  } catch (e) {
+    return fail(res, e.message);
+  }
+}
+function rangeDescription(range) {
+  return `Período UTC: ${range.from || "Sin fecha inicial"} — ${range.to || "Sin fecha final"} (fechas inclusivas).`;
+}
+app.get("/api/activity", staff, rangeMiddleware, (req, res) =>
+  res.json(listActivity(req.user, req.range, true)),
 );
+app.get("/api/activity/count", staff, rangeMiddleware, (req, res) => {
+  const { where, args } = activityQuery(req.user, req.range);
+  res.json({
+    total: db
+      .prepare(
+        `SELECT COUNT(*) AS total FROM activity a JOIN users u ON u.id=a.user_id WHERE ${where}`,
+      )
+      .get(...args).total,
+  });
+});
+const activityHeaders = ["Fecha y hora (UTC)", "Usuario", "Acción", "Detalle"];
+app.get("/api/activity/report.xlsx", staff, rangeMiddleware, (req, res) => {
+  const rows = listActivity(req.user, req.range).map((r) => [
+    r.created_at,
+    r.user,
+    r.action,
+    r.detail,
+  ]);
+  audit(
+    req.user.id,
+    "Reporte de historial Excel",
+    rangeDescription(req.range) + " " + rows.length + " registros",
+  );
+  res
+    .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    .attachment("historial-ceicom.xlsx")
+    .send(workbook(activityHeaders, rows, "Historial CEICOM"));
+});
+app.get("/api/activity/report/print", staff, rangeMiddleware, (req, res) => {
+  const rows = listActivity(req.user, req.range).map((r) => [
+    r.created_at,
+    r.user,
+    r.action,
+    r.detail,
+  ]);
+  audit(
+    req.user.id,
+    "Reporte de historial imprimible",
+    rangeDescription(req.range) + " " + rows.length + " registros",
+  );
+  res
+    .type("html")
+    .send(
+      printReport({
+        title: "Historial de actividad",
+        user: req.user.name,
+        description: rangeDescription(req.range),
+        headers: activityHeaders,
+        rows,
+      }),
+    );
+});
 
 app.use(express.static(path.join(root, "public")));
 app.use((err, req, res, next) => {

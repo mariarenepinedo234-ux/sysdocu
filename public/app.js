@@ -56,7 +56,7 @@ function toast(t) {
   setTimeout(() => ($("#toast").style.display = "none"), 5000);
 }
 function login() {
-  app.innerHTML = `<div class="login"><section class="login-art"><div class="brand">CEICOM<span>®</span></div><div class="subbrand">INSTITUTO TECNOLÓGICO</div><h1>La información correcta.<br>En un solo lugar.</h1><p>Organiza, protege y consulta los documentos académicos y administrativos de nuestra institución.</p><small>GESTIÓN DOCUMENTAL INSTITUCIONAL</small></section><section class="login-form"><form class="login-card"><div class="eyebrow">BIENVENIDO A SYSDOCU</div><h1>Iniciar sesión</h1><p>Ingresa con tu cuenta institucional.</p><label for="email">Correo electrónico</label><input id="email" type="email" name="email" autocomplete="username" required placeholder="nombre@ceicom.edu.bo"><label for="password">Contraseña</label><input id="password" name="password" type="password" autocomplete="current-password" required><div class="error" role="alert"></div><button>Ingresar al sistema →</button><div class="hint">¿Necesitas acceso? Solicita una cuenta al administrador del instituto.</div></form></section></div>`;
+  app.innerHTML = `<div class="login"><section class="login-art"><div class="brand"><img class="institution-logo logo-light" src="/assets/ceicom-logo.png" alt="Instituto Tecnológico CEICOM" width="280" height="124"></div><div class="subbrand">INSTITUTO TECNOLÓGICO</div><h1>La información correcta.<br>En un solo lugar.</h1><p>Organiza, protege y consulta los documentos académicos y administrativos de nuestra institución.</p><small>GESTIÓN DOCUMENTAL INSTITUCIONAL</small></section><section class="login-form"><form class="login-card"><img class="login-form-logo" src="/assets/ceicom-logo.png" alt="Instituto Tecnológico CEICOM" width="220" height="97"><div class="eyebrow">BIENVENIDO A SYSDOCU</div><h1>Iniciar sesión</h1><p>Ingresa con tu cuenta institucional.</p><label for="email">Correo electrónico</label><input id="email" type="email" name="email" autocomplete="username" required placeholder="nombre@ceicom.edu.bo"><label for="password">Contraseña</label><input id="password" name="password" type="password" autocomplete="current-password" required><div class="error" role="alert"></div><button>Ingresar al sistema →</button><div class="hint">¿Necesitas acceso? Solicita una cuenta al administrador del instituto.</div></form></section></div>`;
   $(".login-card").onsubmit = async (e) => {
     e.preventDefault();
     const b = e.currentTarget.querySelector("button");
@@ -95,7 +95,7 @@ const names = {
   backups: "Respaldos",
 };
 function render() {
-  app.innerHTML = `<div class="layout"><aside class="sidebar"><div class="brand">CEICOM<span>®</span></div><div class="subbrand">GESTIÓN DOCUMENTAL</div><div class="nav-title">ESPACIO DE TRABAJO</div><nav class="nav">${[
+  app.innerHTML = `<div class="layout"><aside class="sidebar"><div class="brand"><img class="institution-logo logo-light" src="/assets/ceicom-logo.png" alt="Instituto Tecnológico CEICOM" width="280" height="124"></div><div class="subbrand">GESTIÓN DOCUMENTAL</div><div class="nav-title">ESPACIO DE TRABAJO</div><nav class="nav">${[
     ["dashboard", "◫", "Resumen general"],
     ["documents", "▤", "Documentos"],
     ["categories", "▦", "Categorías"],
@@ -288,15 +288,7 @@ async function show() {
   }
   if (page === "areas") await areasPage(v);
   if (page === "backups") await backupsPage(v);
-  if (page === "activity") {
-    const rows = await api("/activity");
-    v.innerHTML =
-      heading(
-        "Historial de actividad",
-        "Últimas 200 operaciones. El administrador ve todas; el personal administrativo ve sus propias operaciones.",
-      ) +
-      `<section class="panel"><div class="table-scroll"><table><thead><tr><th>FECHA</th><th>USUARIO</th><th>ACCIÓN</th><th>DETALLE</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.created_at)} UTC</td><td>${esc(r.user)}</td><td>${esc(r.action)}</td><td>${esc(r.detail)}</td></tr>`).join("")}</tbody></table></div></section>`;
-  }
+  if (page === "activity") await activityPage(v);
   if (page === "account") {
     v.innerHTML =
       heading("Mi cuenta", "Mantén protegidas tus credenciales de acceso.") +
@@ -639,4 +631,74 @@ async function backupsPage(v) {
       btn.textContent = "Crear respaldo ahora";
     }
   };
+}
+
+function activityTable(rows) {
+  return rows.length
+    ? `<div class="table-scroll"><table class="activity-table"><thead><tr><th>FECHA Y HORA (UTC)</th><th>USUARIO</th><th>ACCIÓN</th><th>DETALLE</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.created_at)}</td><td>${esc(r.user)}</td><td><span class="badge">${esc(r.action)}</span></td><td class="activity-detail">${esc(r.detail)}</td></tr>`).join("")}</tbody></table></div>`
+    : '<div class="empty"><b>No hay actividad en este período</b>Prueba con otras fechas o limpia los filtros.</div>';
+}
+async function activityPage(view) {
+  view.innerHTML =
+    heading(
+      "Historial de actividad",
+      "Consulta las operaciones y genera reportes por período. El administrador ve todas; el personal administrativo, solo las suyas.",
+      '<button id="history-report"><span aria-hidden="true">▤</span> &nbsp; Reportes</button>',
+    ) +
+    `<section class="panel"><div class="panel-head"><h2>Registro de operaciones</h2><small id="activity-count" aria-live="polite">Cargando…</small></div><form id="activity-filters" class="filters activity-filters"><label for="activity-from">Desde<input id="activity-from" name="from" type="date"></label><label for="activity-to">Hasta<input id="activity-to" name="to" type="date"></label><div class="filter-buttons"><button type="submit">Aplicar filtros</button><button type="reset" class="secondary">Limpiar</button></div></form><div class="history-help">Las fechas incluyen el día completo y corresponden al horario UTC del registro.</div><p id="activity-error" class="error history-error" role="alert"></p><div id="activity-results"><div class="empty">Cargando actividad…</div></div></section>`;
+  const form = $("#activity-filters");
+  let applied = { from: "", to: "" };
+  let total = 0;
+  let serial = 0;
+  let loading = true;
+  const reportButton = $("#history-report");
+  reportButton.disabled = true;
+  const search = async () => {
+    const request = ++serial;
+    loading = true;
+    reportButton.disabled = true;
+    const wanted = Object.fromEntries(new FormData(form));
+    const params = new URLSearchParams(wanted);
+    $("#activity-error").textContent = "";
+    try {
+      const [rows, count] = await Promise.all([
+        api("/activity?" + params),
+        api("/activity/count?" + params),
+      ]);
+      if (request !== serial || !view.isConnected) return;
+      applied = wanted;
+      total = count.total;
+      $("#activity-results").innerHTML = activityTable(rows);
+      $("#activity-count").textContent =
+        `Mostrando ${rows.length} de ${total} operaciones`;
+    } catch (e) {
+      if (request === serial && view.isConnected)
+        $("#activity-error").textContent = e.message;
+    } finally {
+      if (request === serial && view.isConnected) {
+        loading = false;
+        reportButton.disabled = false;
+      }
+    }
+  };
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    search();
+  };
+  form.onreset = () => setTimeout(search, 0);
+  reportButton.onclick = () => {
+    if (loading) return;
+    const current = Object.fromEntries(new FormData(form));
+    if (current.from !== applied.from || current.to !== applied.to) {
+      $("#activity-error").textContent =
+        "Pulsa «Aplicar filtros» antes de generar el reporte con las fechas nuevas.";
+      return;
+    }
+    const params = new URLSearchParams(applied);
+    infoDialog(
+      "Reportes del historial",
+      `<p>Período: <strong>${esc(applied.from || "Sin fecha inicial")}</strong> al <strong>${esc(applied.to || "Sin fecha final")}</strong> (UTC).</p><p>El reporte incluye todas las operaciones del período que tu cuenta puede consultar, aunque el listado muestre solo las últimas 200. Coincidencias al aplicar filtros: <strong>${total}</strong>.</p><div class="history-report-options"><a class="link-button" href="/api/activity/report.xlsx?${esc(params.toString())}">Descargar Excel</a><a class="link-button" href="/api/activity/report/print?${esc(params.toString())}" target="_blank" rel="noopener">Imprimir / Guardar como PDF</a></div><p class="history-help">La generación del reporte queda registrada en el historial.</p>`,
+    );
+  };
+  await search();
 }

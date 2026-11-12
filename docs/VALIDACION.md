@@ -47,3 +47,16 @@ No se presentan mejoras porcentuales de tiempo sin medirlas. Para obtener eviden
 5. Adjunta capturas sin credenciales, resultados de pruebas y las limitaciones observadas.
 
 Actualiza los requisitos, alcance, diagramas y casos de uso del documento académico para incluir versiones, revisiones, áreas, reportes y respaldo. Distingue funciones implementadas de propuestas futuras.
+
+## Historial e identidad institucional (2.1)
+
+`test/activity.test.js` usa datos temporales en el puerto 3205 y comprueba:
+
+- Límites inclusivos de fechas, días únicos y 29 de febrero válido.
+- Rechazo de fechas inexistentes, parámetros duplicados y rangos invertidos.
+- Permisos del administrador y personal administrativo, y rechazo al docente o usuario sin sesión.
+- Exportación de más de 200 operaciones y coincidencia con el período completo.
+- Texto escapado en HTML y celdas de texto en Excel, sin fórmulas ejecutables.
+- Reportes vacíos, auditoría de exportaciones y disponibilidad del logo.
+
+La revisión en Chromium cubre logo y colores en login/panel, filtros del historial, mensajes de error, limpieza, Excel y reporte PDF, así como adaptación móvil. Los cambios de identidad visual no modifican el esquema de base de datos.

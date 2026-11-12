@@ -1,4 +1,4 @@
-# Manual de usuario · SYSDOCU CEICOM 2.0
+# Manual de usuario · SYSDOCU CEICOM 2.1
 
 ## Preparación por el administrador
 
@@ -48,6 +48,19 @@ El administrador puede revisar todos los documentos; el personal administrativo,
 **Retirar** envía el documento a la papelera y bloquea su consulta/descarga. No borra archivos ni versiones. En **Papelera → Restaurar**, confirma la recuperación. Vuelve al repositorio como Pendiente y conserva su historial.
 
 Cada usuario ve en la papelera solo los documentos que puede gestionar. No hay eliminación definitiva ni caducidad automática.
+
+## Historial y reportes de actividad
+
+En **Historial de actividad** selecciona **Desde** y **Hasta**, y pulsa **Aplicar filtros**. Las fechas incluyen ambos días completos y usan UTC, el horario indicado en la tabla. Puedes dejar cualquiera de las dos fechas vacía. **Limpiar** vuelve al historial sin rango.
+
+El administrador consulta las operaciones de todas las cuentas; el personal administrativo solo las suyas. Los docentes no acceden a este módulo. La pantalla muestra hasta 200 operaciones y el conteo completo de coincidencias.
+
+Pulsa **Reportes** para abrir las opciones:
+
+- **Descargar Excel:** exporta todas las operaciones autorizadas del período en `.xlsx`.
+- **Imprimir / Guardar como PDF:** abre el reporte con el logo institucional. Usa el botón de impresión y elige el destino PDF del navegador.
+
+Los reportes usan las fechas de la última búsqueda aplicada y no están limitados a las 200 filas de la pantalla. Si cambias una fecha, aplica los filtros antes de generarlos. Los rangos invertidos o fechas inválidas se rechazan. La generación del reporte también queda registrada como actividad, por lo que el conteo puede aumentar al consultar de nuevo.
 
 ## Respaldos
 

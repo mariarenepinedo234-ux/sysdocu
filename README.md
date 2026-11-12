@@ -1,4 +1,4 @@
-# SYSDOCU 2.0 · Instituto Tecnológico CEICOM
+# SYSDOCU 2.1 · Instituto Tecnológico CEICOM
 
 Sistema web de gestión documental en **JavaScript, Node.js, Express y SQLite**. Interfaz en español para computadora y móvil. No necesita MySQL, XAMPP ni compilación del frontend.
 
@@ -40,8 +40,12 @@ La migración es automática: conserva usuarios, contraseñas, archivos, IDs, fe
 - Revisión con estados **Pendiente**, **Aprobado** y **Observado**, comentarios e historial de decisiones por versión. Las observaciones requieren comentario. Se rechaza la aprobación si la versión cambió desde que se abrió el listado.
 - Papelera con restauración; no hay eliminación definitiva ni borrado automático de documentos.
 - Inventario Excel `.xlsx` y reporte imprimible para **Guardar como PDF** desde el navegador. Usan los filtros aplicados y los permisos del usuario; no incluyen documentos de la papelera.
-- Auditoría de operaciones. Administradores ven las últimas 200; administrativos ven sus últimas 200 operaciones.
+- Historial con filtros Desde/Hasta (días completos en UTC), conteo total y botón Reportes para Excel y PDF mediante impresión. El listado muestra hasta 200 operaciones; el reporte incluye todo el período autorizado. Administradores ven todas las cuentas; administrativos, solo sus propias operaciones.
 - Respaldos ZIP manuales y automáticos, descarga administrativa y restauración por comando con el servidor detenido.
+
+## Identidad institucional
+
+La interfaz utiliza guindo `#74180f`, guindo oscuro `#4c100d`, blanco, crema y grises. El logo ovalado de CEICOM, preparado con fondo transparente a partir de la referencia suministrada, aparece en el login, el panel lateral y los reportes imprimibles. En fondos oscuros se presenta en tono claro mediante CSS. El archivo reutilizable es `public/assets/ceicom-logo.png`.
 
 ## Permisos
 
@@ -90,7 +94,7 @@ SQLite es adecuada para esta instalación en un único servidor. Los respaldos y
 npm.cmd test
 ```
 
-La suite usa datos temporales y los puertos **3197, 3199 y 3201**, que deben estar libres. Comprueba permisos, archivos, filtros, versiones, revisión, papelera, reportes, respaldos, restauración y migración desde v1. No modifica tu base de desarrollo. No se atribuyen a esta implementación los resultados declarados en el documento académico original.
+La suite usa datos temporales y los puertos **3197, 3199, 3201 y 3205**, que deben estar libres. Comprueba permisos, archivos, filtros, versiones, revisión, papelera, reportes, respaldos, restauración y migración desde v1. No modifica tu base de desarrollo. No se atribuyen a esta implementación los resultados declarados en el documento académico original.
 
 - [Manual de usuario](docs/MANUAL.md)
 - [Modelo de datos y arquitectura](docs/ARQUITECTURA.md)
