@@ -1,1 +1,20 @@
-{"name":"ceicom-documentos","version":"1.0.0","private":true,"type":"module","engines":{"node":">=22.13.0"},"scripts":{"dev":"node --watch server.js","start":"node server.js","test":"node --test"},"dependencies":{"adm-zip":"^0.5.16","express":"^5.1.0","multer":"^2.0.2"}}
+{
+  "name": "ceicom-documentos",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "test": "node --test",
+    "restore": "node scripts/restore.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  }
+}

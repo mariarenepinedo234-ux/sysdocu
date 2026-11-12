@@ -1,72 +1,101 @@
-# SYSDOCU · Instituto Tecnológico CEICOM
+# SYSDOCU 2.0 · Instituto Tecnológico CEICOM
 
-Sistema web de gestión documental basado en el proyecto de grado suministrado. Implementación en **JavaScript, Node.js, Express y SQLite**, con interfaz en español adaptable a dispositivos móviles. SQLite está integrado en Node.js: no requiere MySQL, XAMPP ni servicios adicionales.
+Sistema web de gestión documental en **JavaScript, Node.js, Express y SQLite**. Interfaz en español para computadora y móvil. No necesita MySQL, XAMPP ni compilación del frontend.
 
-## Instalación en Windows
+## Ejecutar en Windows
 
-Instala **Node.js 24 LTS** (mínimo 22.13). Abre una terminal en esta carpeta:
+Instala **Node.js 24 LTS** (mínimo 22.13). Abre una terminal en la carpeta del proyecto:
 
 ```powershell
 npm.cmd install
 npm.cmd run dev
 ```
 
-Abre `http://localhost:3000`. En Linux/macOS usa `npm install` y `npm run dev`. Para ejecutar sin vigilancia de archivos: `npm start`. Para detener: Ctrl+C.
+Abre `http://localhost:3000`. En Linux/macOS usa `npm install` y `npm run dev`. `npm start` ejecuta sin vigilancia de archivos. Para detener, Ctrl+C.
 
-## Primer acceso
+### Primer ingreso
 
-En el primer arranque se crea automáticamente la base de datos, las categorías iniciales y el administrador:
+- Correo: `admin@ceicom.edu.bo`.
+- Contraseña aleatoria: archivo local `data/acceso-inicial.txt`, creado en el primer arranque.
 
-- Correo: `admin@ceicom.edu.bo`
-- Contraseña: generada aleatoriamente en `data/acceso-inicial.txt`.
+Cambia la contraseña desde **Mi cuenta** y elimina ese archivo si ya no lo necesitas. No se sirve por HTTP ni se incluye en respaldos. Puedes definir `ADMIN_PASSWORD` antes del primer arranque; no reemplaza contraseñas existentes. El administrador crea las cuentas del personal.
 
-Abre ese archivo localmente y cambia la contraseña desde **Mi cuenta**. Después puedes eliminar el archivo de credenciales. No se publica ni se envía al navegador. Alternativamente configura `ADMIN_PASSWORD` antes del primer arranque; solo se utiliza cuando todavía no hay usuarios. No existe registro público de cuentas: el administrador crea las cuentas del personal.
+## Actualizar desde la versión anterior sin perder datos
 
-## Funcionalidades
+1. Detén el servidor anterior con Ctrl+C.
+2. Guarda una copia externa de **toda** la carpeta `data`.
+3. Extrae la nueva versión en otra carpeta y copia allí tu carpeta `data` anterior. No reemplaces los datos con una carpeta vacía.
+4. Ejecuta los dos comandos de instalación e inicio anteriores.
 
-- Inicio/cierre de sesión y cambio de contraseña; contraseñas con scrypt y sesiones de 8 horas mediante cookies HttpOnly y SameSite.
-- Resumen con documentos recientes, categorías y volumen de archivos accesibles.
-- Administración de usuarios: alta, modificación, roles y desactivación. Cambiar una cuenta invalida sus sesiones.
-- Categorías configurables: alta, edición y eliminación cuando no tengan documentos vinculados.
-- Carga de PDF, DOC y DOCX hasta 10 MB, con validación de extensión y firma/estructura básica.
-- Metadatos: título, descripción, categoría, responsable, fecha y visibilidad.
-- Búsqueda por título, descripción y nombre del archivo; filtro por categoría.
-- Descarga protegida, edición de metadatos y retiro lógico de documentos.
-- Historial de las últimas 200 operaciones para personal administrativo y administradores.
+La migración es automática: conserva usuarios, contraseñas, archivos, IDs, fechas y documentos retirados. Crea una versión inicial para cada archivo y asigna los registros al área **General**. Los documentos anteriores conservan su disponibilidad con estado **Aprobado**; los nuevos, restaurados o modificados quedan **Pendientes**. Se crea además un respaldo previo a la migración si existen usuarios. La aplicación impide usar simultáneamente la misma carpeta de datos desde dos procesos del sistema.
 
-| Operación | Administrador | Administrativo | Docente |
-| --- | --- | --- | --- |
-| Usuarios y categorías | Gestionar | Consultar categorías | Consultar categorías |
-| Subir documentos | Sí | Sí | Sí |
-| Consultar/descargar | Todos | Todos | Propios e institucionales |
-| Editar/retirar | Todos | Todos | Propios |
-| Historial de actividad | Sí | Sí | No |
+## Funciones incluidas
 
-**Restringido** significa propietario y personal administrativo, incluyendo administrador. **Institucional** permite consulta por cualquier cuenta activa. Usa acceso restringido para documentos personales. Estas políticas concretan los roles del documento de grado.
+- Usuarios, roles, áreas/carreras y categorías configurables.
+- Carga PDF/DOC/DOCX de hasta 10 MB, validación básica de formato y archivos fuera de la carpeta pública.
+- Gestión académica, título, descripción, categoría, área, responsable y visibilidad.
+- Búsqueda y filtros combinables por texto, categoría, área, responsable, formato, estado, gestión y fechas de creación.
+- Vista previa de PDF autenticada; Word se descarga. El visor depende del soporte PDF del navegador.
+- Versiones de archivos: conserva originales, autor, fecha, nota y SHA-256; cada carga nueva vuelve a revisión.
+- Revisión con estados **Pendiente**, **Aprobado** y **Observado**, comentarios e historial de decisiones por versión. Las observaciones requieren comentario. Se rechaza la aprobación si la versión cambió desde que se abrió el listado.
+- Papelera con restauración; no hay eliminación definitiva ni borrado automático de documentos.
+- Inventario Excel `.xlsx` y reporte imprimible para **Guardar como PDF** desde el navegador. Usan los filtros aplicados y los permisos del usuario; no incluyen documentos de la papelera.
+- Auditoría de operaciones. Administradores ven las últimas 200; administrativos ven sus últimas 200 operaciones.
+- Respaldos ZIP manuales y automáticos, descarga administrativa y restauración por comando con el servidor detenido.
 
-El retiro oculta el registro y bloquea su descarga; conserva el archivo como resguardo. No incluye papelera/restauración en interfaz, reemplazo de archivos ni historial de versiones. No implementa OCR, escaneo, clasificación automática o respaldos automáticos. Las cifras de validación del documento académico no se toman como pruebas de esta implementación.
+## Permisos
 
-## Datos y respaldo
+| Acción                           | Administrador  | Administrativo             | Docente                    |
+| -------------------------------- | -------------- | -------------------------- | -------------------------- |
+| Usuarios, áreas y categorías     | Gestionar      | Consultar áreas/categorías | Consultar áreas/categorías |
+| Crear documentos                 | Cualquier área | Su área                    | Su área                    |
+| Gestionar documentos y versiones | Todos          | Propios y de su área       | Propios                    |
+| Aprobar / observar               | Todos          | Su área                    | No                         |
+| Restaurar desde papelera         | Todos          | Propios y de su área       | Propios                    |
+| Respaldos completos              | Sí             | No                         | No                         |
 
-Todo el contenido persistente se guarda en `data/` (ignorado por Git): base `ceicom.sqlite`, archivos en `files/` y credenciales iniciales. Para un respaldo manual consistente, detén el servidor y copia **toda la carpeta `data`** a un lugar seguro. Para restaurar, detén el servidor y reemplaza la carpeta por la copia. Protege los respaldos porque contienen información institucional.
+El propietario y los gestores del documento pueden consultarlo aunque esté pendiente u observado. Para otros lectores, se requiere estado **Aprobado** y se aplica la visibilidad:
 
-Variables opcionales: `PORT` (3000), `HOST` (127.0.0.1), `DATA_DIR` (ruta de datos) y `ADMIN_PASSWORD` (solo creación inicial). No son necesarias para iniciar. El mensaje de credenciales usa la ruta predeterminada; si personalizas `DATA_DIR`, el archivo estará en esa carpeta.
+- **Restringido:** propietario, administrador y personal administrativo del área del documento.
+- **Área / carrera:** además, cuentas de la misma área.
+- **Institucional:** además, cualquier cuenta activa.
 
-El servidor escucha únicamente en el equipo local por defecto. Para despliegue institucional, configura HTTPS con proxy inverso, permisos del directorio de datos y política de respaldos. La comprobación de formato no sustituye un antivirus; no abras archivos de origen desconocido. El contenido de Word se descarga, no se renderiza como HTML.
+La descarga de versiones antiguas se reserva a quienes pueden gestionar el documento. El retiro bloquea toda descarga, incluida la de versiones antiguas. Restaurar vuelve a estado Pendiente. El propietario conserva sus documentos si cambia de área. Un administrativo que conserva documentos propios en otra área puede gestionarlos, pero no aprobarlos allí; debe hacerlo un revisor de esa área o el administrador. Para datos personales utiliza acceso restringido.
 
-## Validación
+## Respaldos y recuperación
+
+El servidor comprueba cada minuto si pasaron 24 horas desde la copia más reciente. Genera una copia al primer arranque y cuando corresponde al reiniciar. **Solo funciona con el servidor activo**; no instala servicios ni tareas del sistema operativo. La limpieza de una ejecución automática conserva las siete copias ZIP más recientes; las copias manuales pueden superar ese número hasta la próxima ejecución automática.
+
+Cada ZIP contiene una instantánea SQLite consistente, todos los archivos (incluidas versiones y retirados) y un manifiesto con tamaños y SHA-256. Se excluyen sesiones y el archivo de acceso inicial. Las copias incluyen datos personales y hashes de contraseñas: solo puede descargarlas el administrador. Descarga periódicamente una copia a **otro equipo o almacenamiento protegido**; el mismo disco no protege contra su pérdida.
+
+Para restaurar:
+
+```powershell
+# Primero detén el servidor con Ctrl+C.
+npm.cmd run restore -- "C:\respaldos\ceicom-AAAA-MM-DD.zip"
+npm.cmd run dev
+```
+
+El comando rechaza un servidor activo, rutas no permitidas, archivos faltantes, tamaños/hashes incorrectos y bases inconsistentes. Antes de reemplazar los datos crea un respaldo preventivo del estado actual. Los respaldos anteriores se conservan. Todas las sesiones se cierran tras restaurar; usa las credenciales vigentes en la fecha del respaldo. Los hashes detectan alteraciones, pero no son una firma digital: restaura únicamente copias de confianza. El restaurador admite hasta 1 GB descomprimido y 100 000 entradas.
+
+## Configuración y límites
+
+Variables opcionales: `PORT` (3000), `HOST` (127.0.0.1), `DATA_DIR` (carpeta `data` junto al proyecto), `ADMIN_PASSWORD` (solo creación inicial). Si cambias `DATA_DIR`, usa la misma variable al restaurar. No se requieren variables para uso local.
+
+SQLite es adecuada para esta instalación en un único servidor. Los respaldos y reportes se generan en el proceso y pueden pausarlo brevemente; para grandes volúmenes conviene separar estas tareas y evaluar PostgreSQL. Para despliegue institucional configura HTTPS y permisos del directorio. La verificación de formato no sustituye un antivirus. No se implementan OCR, firma digital, notificaciones por correo ni clasificación automática. El versionado conserva archivos; no captura cada cambio de metadatos como una versión. La aprobación es una revisión operativa, no una firma legal.
+
+## Validación y documentación
 
 ```powershell
 npm.cmd test
 ```
 
-Pruebas de integración con datos temporales: autenticación, roles, carga/rechazo de formatos y tamaño, privacidad, integridad de descarga, búsqueda, edición, retiro, auditoría, cambio de contraseña y persistencia al reiniciar. No modifican la base de desarrollo. El puerto 3197 debe estar libre.
+La suite usa datos temporales y los puertos **3197, 3199 y 3201**, que deben estar libres. Comprueba permisos, archivos, filtros, versiones, revisión, papelera, reportes, respaldos, restauración y migración desde v1. No modifica tu base de desarrollo. No se atribuyen a esta implementación los resultados declarados en el documento académico original.
 
-## Estructura
+- [Manual de usuario](docs/MANUAL.md)
+- [Modelo de datos y arquitectura](docs/ARQUITECTURA.md)
+- [Requisitos, pruebas y medición](docs/VALIDACION.md)
 
-- `server.js`: servidor, API, permisos, SQLite y almacenamiento.
-- `public/`: interfaz HTML, CSS y JavaScript, sin compilación necesaria.
-- `test/system.test.js`: pruebas de integración.
-- `package-lock.json`: versiones de dependencias reproducibles; usa `npm ci` en automatización.
+Código: `server.js` (API y migraciones), `lib/storage.js` (respaldo/recuperación), `scripts/restore.js` (restauración), `public/` (interfaz), `test/` (pruebas). `data/` y `node_modules/` están excluidos de Git. Usa `npm ci` para una instalación reproducible.
 
-Cada tarea de nube tiene un entorno aislado. Usa este checkout en `/workspace/sysdocu`; no se necesitan worktrees.
+Cada tarea de nube tiene un entorno aislado. Usa el checkout existente `/workspace/sysdocu`; no se necesitan worktrees.
